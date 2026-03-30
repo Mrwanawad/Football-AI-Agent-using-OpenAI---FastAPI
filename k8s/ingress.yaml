@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ai-agent-platform
+  namespace: ai-agent-platform
+  labels:
+    app.kubernetes.io/name: ai-agent-platform
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"       # allow audio uploads
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"     # long timeout for OpenAI calls
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "120"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: ai-agent-platform.example.com         # <-- replace with your domain
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ai-agent-platform
+                port:
+                  name: http
+  # Uncomment below to enable TLS
+  # tls:
+  #   - hosts:
+  #       - ai-agent-platform.example.com
+  #     secretName: ai-agent-platform-tls

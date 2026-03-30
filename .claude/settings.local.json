@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la \"C:\\\\Users\\\\KimoStore\\\\Desktop\\\\AI Agent Platform\"\" | grep -E \"conftest)",
+      "Bash(pytest\" || echo \"No conftest files found \")",
+      "Bash(python -m pytest app/tests/test_chat.py::TestSessions::test_create_session -v)"
+    ]
+  }
+}

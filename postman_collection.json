@@ -1,0 +1,195 @@
+{
+  "info": {
+    "name": "AI Agent Platform",
+    "description": "Complete API collection for the AI Agent Platform backend.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000/api/v1", "type": "string" },
+    { "key": "token",    "value": "",                             "type": "string" },
+    { "key": "agent_id", "value": "",                             "type": "string" },
+    { "key": "session_id","value": "",                            "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:8000/health", "host": ["localhost"], "port": "8000", "path": ["health"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 201', () => pm.response.to.have.status(201));",
+            "pm.test('Has id', () => pm.expect(pm.response.json()).to.have.property('id'));"
+          ], "type": "text/javascript" }}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"myuser\",\n  \"email\": \"myuser@example.com\",\n  \"password\": \"password123\"\n}" },
+            "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Login (Get Token)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "const json = pm.response.json();",
+            "pm.collectionVariables.set('token', json.access_token);",
+            "pm.test('Token saved', () => pm.expect(json.access_token).to.be.a('string'));"
+          ], "type": "text/javascript" }}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": { "mode": "urlencoded", "urlencoded": [
+              { "key": "username", "value": "myuser" },
+              { "key": "password", "value": "password123" }
+            ]},
+            "url": { "raw": "{{base_url}}/auth/token", "host": ["{{base_url}}"], "path": ["auth", "token"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Agents",
+      "item": [
+        {
+          "name": "Create Agent",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 201', () => pm.response.to.have.status(201));",
+            "pm.collectionVariables.set('agent_id', pm.response.json().id);"
+          ], "type": "text/javascript" }}],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Support Bot\",\n  \"prompt\": \"You are a friendly customer support agent. Always be polite and concise.\"\n}" },
+            "url": { "raw": "{{base_url}}/agents", "host": ["{{base_url}}"], "path": ["agents"] }
+          }
+        },
+        {
+          "name": "List Agents",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/agents", "host": ["{{base_url}}"], "path": ["agents"] }
+          }
+        },
+        {
+          "name": "Get Agent",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/agents/{{agent_id}}", "host": ["{{base_url}}"], "path": ["agents", "{{agent_id}}"] }
+          }
+        },
+        {
+          "name": "Update Agent",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Updated Support Bot\",\n  \"prompt\": \"You are an expert support agent.\"\n}" },
+            "url": { "raw": "{{base_url}}/agents/{{agent_id}}", "host": ["{{base_url}}"], "path": ["agents", "{{agent_id}}"] }
+          }
+        },
+        {
+          "name": "Delete Agent",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/agents/{{agent_id}}", "host": ["{{base_url}}"], "path": ["agents", "{{agent_id}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sessions",
+      "item": [
+        {
+          "name": "Create Session",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 201', () => pm.response.to.have.status(201));",
+            "pm.collectionVariables.set('session_id', pm.response.json().id);"
+          ], "type": "text/javascript" }}],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"My First Chat\"\n}" },
+            "url": { "raw": "{{base_url}}/agents/{{agent_id}}/sessions", "host": ["{{base_url}}"], "path": ["agents", "{{agent_id}}", "sessions"] }
+          }
+        },
+        {
+          "name": "List Sessions",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/agents/{{agent_id}}/sessions", "host": ["{{base_url}}"], "path": ["agents", "{{agent_id}}", "sessions"] }
+          }
+        },
+        {
+          "name": "Get Session (with messages)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/agents/{{agent_id}}/sessions/{{session_id}}", "host": ["{{base_url}}"], "path": ["agents", "{{agent_id}}", "sessions", "{{session_id}}"] }
+          }
+        },
+        {
+          "name": "Delete Session",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/agents/{{agent_id}}/sessions/{{session_id}}", "host": ["{{base_url}}"], "path": ["agents", "{{agent_id}}", "sessions", "{{session_id}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Messaging",
+      "item": [
+        {
+          "name": "Send Text Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"Hello! Can you help me?\"\n}" },
+            "url": { "raw": "{{base_url}}/agents/{{agent_id}}/sessions/{{session_id}}/messages", "host": ["{{base_url}}"], "path": ["agents", "{{agent_id}}", "sessions", "{{session_id}}", "messages"] }
+          }
+        },
+        {
+          "name": "Send Voice Message",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [{ "key": "audio", "type": "file", "src": "/path/to/your/audio.webm", "description": "Audio file (webm, mp3, wav, ogg, m4a)" }]
+            },
+            "url": { "raw": "{{base_url}}/agents/{{agent_id}}/sessions/{{session_id}}/voice", "host": ["{{base_url}}"], "path": ["agents", "{{agent_id}}", "sessions", "{{session_id}}", "voice"] },
+            "description": "Upload an audio file. Returns audio/mpeg binary — save the response to a file to play it."
+          }
+        }
+      ]
+    }
+  ]
+}
