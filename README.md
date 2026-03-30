@@ -62,7 +62,7 @@
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/<your-username>/ai-agent-platform.git
+git clone https://github.com/Mrwanawad/ai-agent-platform.git
 cd ai-agent-platform
 ```
 
